@@ -1,0 +1,25 @@
+# Ignore video and output files
+videos/
+videos/output/
+*.wav
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.flv
+*.wmv
+*.mp3
+*.m4a
+*.flac
+*.ogg
+*.mpga
+*.webm
+*.txt
+*.md
+# But keep the .gitkeep files
+!videos/.gitkeep
+!videos/output/.gitkeep
+# Do not ignore source code or test files
+!*.py
+!requirements.txt
+!README.md
