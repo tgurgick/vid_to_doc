@@ -16,6 +16,7 @@ from .core.transcriber import Transcriber
 from .core.summarizer import Summarizer
 from .core.doc_generator import DocGenerator
 from .utils.file_utils import get_video_files_from_folder, save_text_to_file, ensure_output_directory
+from .utils.youtube_utils import download_youtube_video, get_video_info, is_youtube_url
 from config.logging_config import setup_logging, get_logger
 
 # Initialize console for rich output
@@ -601,6 +602,223 @@ def generate_doc(cli_ctx: CLIContext, content: str, output: Path, type: str) -> 
         sys.exit(1)
 
 
+@main.command()
+@click.argument("url", type=str)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(path_type=Path),
+    help="Output directory for downloaded video",
+)
+@click.option(
+    "--quality",
+    "-q",
+    type=str,
+    default="best",
+    help="Video quality (best, worst, 720p, 480p, etc.)",
+)
+@click.option(
+    "--audio-only",
+    "-a",
+    is_flag=True,
+    help="Download audio only",
+)
+@click.option(
+    "--filename",
+    "-f",
+    type=str,
+    help="Custom filename (without extension)",
+)
+@pass_cli_context
+def download(cli_ctx: CLIContext, url: str, output_dir: Optional[Path], quality: str, audio_only: bool, filename: Optional[str]) -> None:
+    """Download a YouTube video for processing.
+    
+    ⚠️ EDUCATIONAL USE ONLY: This command is for educational and non-commercial 
+    testing purposes only. Ensure compliance with YouTube's Terms of Service and 
+    copyright laws. Only download content you own or have permission to download.
+    """
+    logger = get_logger("cli.download")
+    
+    # Display educational use warning
+    console.print("[yellow]⚠️  EDUCATIONAL USE ONLY: Ensure compliance with YouTube's Terms of Service and copyright laws.[/yellow]")
+    
+    try:
+        if not is_youtube_url(url):
+            console.print("[red]Error: Invalid YouTube URL[/red]")
+            sys.exit(1)
+        
+        console.print(f"[blue]Downloading YouTube video: {url}[/blue]")
+        
+        # Download the video
+        downloaded_file = download_youtube_video(
+            url=url,
+            output_dir=output_dir,
+            quality=quality,
+            audio_only=audio_only,
+            filename=filename
+        )
+        
+        console.print(f"[green]✓ Video downloaded successfully![/green]")
+        console.print(f"[green]File saved to: {downloaded_file}[/green]")
+        
+        # Show file info
+        file_size = downloaded_file.stat().st_size
+        file_size_mb = file_size / (1024 * 1024)
+        console.print(f"[blue]File size: {file_size_mb:.1f} MB[/blue]")
+        
+    except Exception as e:
+        logger.error(f"YouTube download failed: {e}")
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
+
+
+@main.command()
+@click.argument("url", type=str)
+@pass_cli_context
+def info(cli_ctx: CLIContext, url: str) -> None:
+    """Get information about a YouTube video.
+    
+    ⚠️ EDUCATIONAL USE ONLY: This command is for educational and non-commercial 
+    testing purposes only. Ensure compliance with YouTube's Terms of Service.
+    """
+    logger = get_logger("cli.info")
+    
+    try:
+        if not is_youtube_url(url):
+            console.print("[red]Error: Invalid YouTube URL[/red]")
+            sys.exit(1)
+        
+        console.print(f"[blue]Getting video information: {url}[/blue]")
+        
+        # Get video info
+        video_info = get_video_info(url)
+        
+        console.print(f"\n[bold]Video Information:[/bold]")
+        console.print(f"Title: {video_info['title']}")
+        console.print(f"Duration: {video_info['duration']} seconds ({video_info['duration'] // 60} minutes)")
+        console.print(f"Uploader: {video_info['uploader']}")
+        console.print(f"Views: {video_info['view_count']:,}")
+        console.print(f"Upload Date: {video_info['upload_date']}")
+        console.print(f"Description: {video_info['description']}")
+        
+        if video_info['formats']:
+            console.print(f"\n[bold]Available Formats:[/bold]")
+            for format_info in video_info['formats'][:5]:  # Show first 5 formats
+                console.print(f"  - {format_info}")
+        
+    except Exception as e:
+        logger.error(f"Failed to get video info: {e}")
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
+
+
+@main.command()
+@click.argument("url", type=str)
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(path_type=Path),
+    help="Output directory for downloaded video",
+)
+@click.option(
+    "--quality",
+    "-q",
+    type=str,
+    default="best",
+    help="Video quality (best, worst, 720p, 480p, etc.)",
+)
+@click.option(
+    "--filename",
+    "-f",
+    type=str,
+    help="Custom filename (without extension)",
+)
+@pass_cli_context
+def download_and_process(cli_ctx: CLIContext, url: str, output_dir: Optional[Path], quality: str, filename: Optional[str]) -> None:
+    """Download a YouTube video and process it through the full pipeline.
+    
+    ⚠️ EDUCATIONAL USE ONLY: This command is for educational and non-commercial 
+    testing purposes only. Ensure compliance with YouTube's Terms of Service and 
+    copyright laws. Only download content you own or have permission to download.
+    """
+    logger = get_logger("cli.download_and_process")
+    config = cli_ctx.config
+    
+    # Check if API key is available
+    if not config.openai_api_key:
+        console.print("[red]Error: OpenAI API key is required. Set OPENAI_API_KEY environment variable, provide in config file, or use --api-key option.[/red]")
+        sys.exit(1)
+    
+    # Display educational use warning
+    console.print("[yellow]⚠️  EDUCATIONAL USE ONLY: Ensure compliance with YouTube's Terms of Service and copyright laws.[/yellow]")
+    
+    try:
+        if not is_youtube_url(url):
+            console.print("[red]Error: Invalid YouTube URL[/red]")
+            sys.exit(1)
+        
+        console.print(f"[blue]Downloading and processing YouTube video: {url}[/blue]")
+        
+        # Step 1: Download the video
+        console.print(f"\n[blue]Step 1: Downloading video...[/blue]")
+        downloaded_file = download_youtube_video(
+            url=url,
+            output_dir=output_dir,
+            quality=quality,
+            filename=filename
+        )
+        
+        # Step 2: Process the downloaded video
+        console.print(f"\n[blue]Step 2: Processing video...[/blue]")
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console
+        ) as progress:
+            # Extract audio
+            task1 = progress.add_task("Extracting audio...", total=None)
+            extractor = AudioExtractor()
+            audio_path = extractor.extract_audio(downloaded_file)
+            progress.update(task1, completed=True)
+            
+            # Transcribe audio
+            task2 = progress.add_task("Transcribing audio...", total=None)
+            transcriber = Transcriber(
+                api_key=config.openai_api_key,
+                model=config.transcription.model
+            )
+            transcript = transcriber.transcribe(audio_path)
+            progress.update(task2, completed=True)
+            
+            # Summarize transcript
+            task3 = progress.add_task("Generating summary...", total=None)
+            summarizer = Summarizer(
+                api_key=config.openai_api_key,
+                model=config.summarization.model
+            )
+            summary = summarizer.summarize(transcript)
+            progress.update(task3, completed=True)
+            
+            # Generate documentation
+            task4 = progress.add_task("Creating documentation...", total=None)
+            doc_generator = DocGenerator(
+                api_key=config.openai_api_key,
+                model=config.summarization.model
+            )
+            doc_path = doc_generator.generate_engineering_doc(summary, downloaded_file)
+            progress.update(task4, completed=True)
+        
+        console.print(f"\n[green]✓ Full pipeline completed successfully![/green]")
+        console.print(f"[green]Video downloaded to: {downloaded_file}[/green]")
+        console.print(f"[green]Documentation saved to: {doc_path}[/green]")
+        
+    except Exception as e:
+        logger.error(f"Download and process failed: {e}")
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
+
+
 @main.group()
 def config() -> None:
     """Manage configuration."""
@@ -608,10 +826,10 @@ def config() -> None:
 
 
 @config.command()
-@click.pass_context
-def show(ctx: click.Context) -> None:
+@pass_cli_context
+def show(cli_ctx: CLIContext) -> None:
     """Show current configuration."""
-    config = ctx.obj["config"]
+    config = cli_ctx.config
     
     console.print("\n[bold]Current Configuration:[/bold]")
     console.print(f"OpenAI API Key: {'*' * 20 if config.openai_api_key else 'Not set'}")
@@ -625,8 +843,8 @@ def show(ctx: click.Context) -> None:
 @config.command()
 @click.argument("key")
 @click.argument("value")
-@click.pass_context
-def set(ctx: click.Context, key: str, value: str) -> None:
+@pass_cli_context
+def set(cli_ctx: CLIContext, key: str, value: str) -> None:
     """Set a configuration value."""
     # TODO: Implement configuration setting
     console.print(f"[yellow]Setting {key} = {value}[/yellow]")
@@ -634,10 +852,10 @@ def set(ctx: click.Context, key: str, value: str) -> None:
 
 
 @config.command()
-@click.pass_context
-def validate(ctx: click.Context) -> None:
+@pass_cli_context
+def validate(cli_ctx: CLIContext) -> None:
     """Validate current configuration."""
-    config = ctx.obj["config"]
+    config = cli_ctx.config
     
     try:
         # Configuration is validated on load, so if we get here it's valid

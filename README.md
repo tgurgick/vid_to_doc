@@ -2,6 +2,10 @@
 
 Convert video files to documentation using AI transcription and summarization.
 
+## ⚠️ Important Disclaimer
+
+**YouTube Download Functionality**: The YouTube download features in this tool are provided for **educational and non-commercial testing purposes only**. Users are responsible for ensuring compliance with YouTube's Terms of Service and applicable copyright laws. This tool should only be used with content you own or have permission to download.
+
 ## Features
 
 - 🎥 **Video Processing**: Extract audio from various video formats
@@ -11,6 +15,7 @@ Convert video files to documentation using AI transcription and summarization.
 - ⚙️ **Configurable**: Flexible configuration via files, environment variables, or CLI
 - 🚀 **CLI Interface**: Easy-to-use command-line interface
 - 📊 **Progress Tracking**: Visual progress indicators for long-running operations
+- 📥 **YouTube Integration**: Download videos for testing (educational use only)
 
 ## Quick Start
 
@@ -54,6 +59,39 @@ pip install -e ".[dev]"
    ```bash
    vid-to-doc transcribe audio.wav
    ```
+
+## YouTube Integration (Educational Use Only)
+
+⚠️ **Important**: YouTube download functionality is for **educational and non-commercial testing purposes only**. Ensure compliance with YouTube's Terms of Service and copyright laws.
+
+### YouTube Commands
+
+```bash
+# Get video information (no download)
+vid-to-doc info "https://youtube.com/watch?v=VIDEO_ID"
+
+# Download video for testing
+vid-to-doc download "https://youtube.com/watch?v=VIDEO_ID" --output-dir ./videos --quality 720p
+
+# Download and process in one command
+vid-to-doc --api-key "your-key" download-and-process "https://youtube.com/watch?v=VIDEO_ID"
+```
+
+### YouTube Download Options
+
+```bash
+# Download with specific quality
+vid-to-doc download URL --quality 480p
+
+# Download audio only
+vid-to-doc download URL --audio-only
+
+# Custom filename
+vid-to-doc download URL --filename "my_video"
+
+# Specify output directory
+vid-to-doc download URL --output-dir ./downloads
+```
 
 ## Configuration
 

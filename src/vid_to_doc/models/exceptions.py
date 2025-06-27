@@ -54,4 +54,9 @@ class AudioError(VidToDocError):
 
 class TextProcessingError(VidToDocError):
     """Raised when text processing fails."""
+    pass
+
+
+class YouTubeDownloadError(VidToDocError):
+    """Raised when YouTube video download fails."""
     pass 
