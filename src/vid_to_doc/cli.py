@@ -260,7 +260,8 @@ def process(
                     api_key=config.openai_api_key,
                     model=config.summarization.model
                 )
-                doc_path = doc_generator.generate_engineering_doc(summary, input_path)
+                doc_content = doc_generator.generate_engineering_doc(summary)
+                doc_path = doc_generator.save_document(doc_content, input_path, output_dir=output_dir)
                 progress.update(task4, completed=True)
             
             console.print(f"[green]✓ Processing complete![/green]")
@@ -321,7 +322,8 @@ def process(
                             api_key=config.openai_api_key,
                             model=config.summarization.model
                         )
-                        doc_path = doc_generator.generate_engineering_doc(summary, video_file)
+                        doc_content = doc_generator.generate_engineering_doc(summary)
+                        doc_path = doc_generator.save_document(doc_content, video_file, output_dir=output_dir)
                         progress.update(task4, completed=True)
                     
                     console.print(f"[green]✓ {video_file.name} completed[/green]")
@@ -585,11 +587,14 @@ def generate_doc(cli_ctx: CLIContext, content: str, output: Path, type: str) -> 
             )
             
             if type == "engineering":
-                doc_path = doc_generator.generate_engineering_doc(content, output)
+                doc_content = doc_generator.generate_engineering_doc(content)
+                doc_path = doc_generator.save_document(doc_content, output, "engineering_doc")
             elif type == "meeting":
-                doc_path = doc_generator.generate_meeting_notes(content, output)
+                doc_content = doc_generator.generate_meeting_notes(content)
+                doc_path = doc_generator.save_document(doc_content, output, "meeting_notes")
             elif type == "action":
-                doc_path = doc_generator.generate_action_items(content, output)
+                doc_content = doc_generator.generate_action_items(content)
+                doc_path = doc_generator.save_document(doc_content, output, "action_items")
             
             progress.update(task, completed=True)
         
@@ -806,7 +811,8 @@ def download_and_process(cli_ctx: CLIContext, url: str, output_dir: Optional[Pat
                 api_key=config.openai_api_key,
                 model=config.summarization.model
             )
-            doc_path = doc_generator.generate_engineering_doc(summary, downloaded_file)
+            doc_content = doc_generator.generate_engineering_doc(summary)
+            doc_path = doc_generator.save_document(doc_content, downloaded_file, output_dir=output_dir)
             progress.update(task4, completed=True)
         
         console.print(f"\n[green]✓ Full pipeline completed successfully![/green]")
