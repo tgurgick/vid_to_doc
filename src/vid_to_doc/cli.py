@@ -245,6 +245,12 @@ def process(
                 transcript = transcriber.transcribe(audio_path)
                 progress.update(task2, completed=True)
                 
+                # Save transcript
+                transcript_path = save_text_to_file(
+                    transcript, 
+                    input_path.parent / f"{input_path.stem}_transcript.txt"
+                )
+                
                 # Step 3: Summarize transcript
                 task3 = progress.add_task("Generating summary...", total=None)
                 summarizer = Summarizer(
@@ -253,6 +259,12 @@ def process(
                 )
                 summary = summarizer.summarize(transcript)
                 progress.update(task3, completed=True)
+                
+                # Save summary
+                summary_path = save_text_to_file(
+                    summary, 
+                    input_path.parent / f"{input_path.stem}_summary.txt"
+                )
                 
                 # Step 4: Generate documentation
                 task4 = progress.add_task("Creating documentation...", total=None)
@@ -265,6 +277,8 @@ def process(
                 progress.update(task4, completed=True)
             
             console.print(f"[green]✓ Processing complete![/green]")
+            console.print(f"[green]Transcript saved to: {transcript_path}[/green]")
+            console.print(f"[green]Summary saved to: {summary_path}[/green]")
             console.print(f"[green]Documentation saved to: {doc_path}[/green]")
             
         elif is_directory:
@@ -307,6 +321,12 @@ def process(
                         transcript = transcriber.transcribe(audio_path)
                         progress.update(task2, completed=True)
                         
+                        # Save transcript
+                        transcript_path = save_text_to_file(
+                            transcript, 
+                            video_file.parent / f"{video_file.stem}_transcript.txt"
+                        )
+                        
                         # Summarize
                         task3 = progress.add_task("Summarizing...", total=None)
                         summarizer = Summarizer(
@@ -315,6 +335,12 @@ def process(
                         )
                         summary = summarizer.summarize(transcript)
                         progress.update(task3, completed=True)
+                        
+                        # Save summary
+                        summary_path = save_text_to_file(
+                            summary, 
+                            video_file.parent / f"{video_file.stem}_summary.txt"
+                        )
                         
                         # Generate documentation
                         task4 = progress.add_task("Creating docs...", total=None)
@@ -806,6 +832,12 @@ def download_and_process(cli_ctx: CLIContext, url: str, output_dir: Optional[Pat
             transcript = transcriber.transcribe(audio_path)
             progress.update(task2, completed=True)
             
+            # Save transcript
+            transcript_path = save_text_to_file(
+                transcript, 
+                downloaded_file.parent / f"{downloaded_file.stem}_transcript.txt"
+            )
+            
             # Summarize transcript
             task3 = progress.add_task("Generating summary...", total=None)
             summarizer = Summarizer(
@@ -814,6 +846,12 @@ def download_and_process(cli_ctx: CLIContext, url: str, output_dir: Optional[Pat
             )
             summary = summarizer.summarize(transcript)
             progress.update(task3, completed=True)
+            
+            # Save summary
+            summary_path = save_text_to_file(
+                summary, 
+                downloaded_file.parent / f"{downloaded_file.stem}_summary.txt"
+            )
             
             # Generate documentation
             task4 = progress.add_task("Creating documentation...", total=None)
@@ -827,6 +865,8 @@ def download_and_process(cli_ctx: CLIContext, url: str, output_dir: Optional[Pat
         
         console.print(f"\n[green]✓ Full pipeline completed successfully![/green]")
         console.print(f"[green]Video downloaded to: {downloaded_file}[/green]")
+        console.print(f"[green]Transcript saved to: {transcript_path}[/green]")
+        console.print(f"[green]Summary saved to: {summary_path}[/green]")
         console.print(f"[green]Documentation saved to: {doc_path}[/green]")
         
     except Exception as e:
