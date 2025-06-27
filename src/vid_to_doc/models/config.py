@@ -27,7 +27,7 @@ class TranscriptionConfig:
 class SummarizationConfig:
     """Configuration for summarization settings."""
     
-    model: str = "gpt-3.5-turbo"
+    model: str = "gpt-4o"
     max_tokens: int = 500
     temperature: float = 0.7
     system_prompt: str = "Summarize the following transcription into concise knowledge notes."

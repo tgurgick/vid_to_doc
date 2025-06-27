@@ -17,7 +17,7 @@ from .core.summarizer import Summarizer
 from .core.doc_generator import DocGenerator
 from .utils.file_utils import get_video_files_from_folder, save_text_to_file, ensure_output_directory
 from .utils.youtube_utils import download_youtube_video, get_video_info, is_youtube_url
-from config.logging_config import setup_logging, get_logger
+from .utils.logging_utils import setup_logging, get_logger
 
 # Initialize console for rich output
 console = Console()

@@ -10,7 +10,7 @@ from ..models.exceptions import SummarizationError
 class Summarizer:
     """Handles text summarization using OpenAI GPT models."""
 
-    DEFAULT_MODEL = "gpt-3.5-turbo"
+    DEFAULT_MODEL = "gpt-4o"
     DEFAULT_MAX_TOKENS = 500
     DEFAULT_SYSTEM_PROMPT = "Summarize the following transcription into concise knowledge notes."
 

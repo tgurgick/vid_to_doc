@@ -13,7 +13,7 @@ class TestSummarizer:
 
     def test_default_constants(self):
         """Test that default constants are set correctly."""
-        assert Summarizer.DEFAULT_MODEL == "gpt-3.5-turbo"
+        assert Summarizer.DEFAULT_MODEL == "gpt-4o"
         assert Summarizer.DEFAULT_MAX_TOKENS == 500
         assert Summarizer.DEFAULT_SYSTEM_PROMPT == "Summarize the following transcription into concise knowledge notes."
 
@@ -60,7 +60,7 @@ class TestSummarizer:
         assert result == "This is a summary of the text."
         mock_create.assert_called_once()
         call_args = mock_create.call_args
-        assert call_args[1]["model"] == "gpt-3.5-turbo"
+        assert call_args[1]["model"] == "gpt-4o"
         assert call_args[1]["max_tokens"] == 500
         assert len(call_args[1]["messages"]) == 2
         assert call_args[1]["messages"][0]["role"] == "system"

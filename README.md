@@ -9,8 +9,8 @@ Convert video files to documentation using AI transcription and summarization.
 ## Features
 
 - 🎥 **Video Processing**: Extract audio from various video formats
-- 🎤 **AI Transcription**: Transcribe audio using OpenAI's Whisper API
-- 📝 **Smart Summarization**: Generate concise summaries using GPT
+- 🎤 **AI Transcription**: Transcribe audio using OpenAI's GPT-4o transcription model
+- 📝 **Smart Summarization**: Generate concise summaries using GPT-4o
 - 📚 **Documentation Generation**: Create engineering documentation from summaries
 - ⚙️ **Configurable**: Flexible configuration via files, environment variables, or CLI
 - 🚀 **CLI Interface**: Easy-to-use command-line interface
@@ -308,7 +308,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- OpenAI for providing the Whisper and GPT APIs
+- OpenAI for providing the GPT-4o transcription and completion APIs
 - MoviePy for video processing capabilities
 - Click for the excellent CLI framework
-- Rich for beautiful terminal output 
+- Rich for beautiful terminal output
