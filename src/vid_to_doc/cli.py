@@ -240,7 +240,9 @@ def process(
                 task2 = progress.add_task("Transcribing audio...", total=None)
                 transcriber = Transcriber(
                     api_key=config.openai_api_key,
-                    model=config.transcription.model
+                    model=config.transcription.model,
+                    retry_attempts=config.transcription.retry_attempts,
+                    retry_delay=config.transcription.retry_delay
                 )
                 transcript = transcriber.transcribe(audio_path)
                 progress.update(task2, completed=True)
@@ -316,7 +318,9 @@ def process(
                         task2 = progress.add_task("Transcribing...", total=None)
                         transcriber = Transcriber(
                             api_key=config.openai_api_key,
-                            model=config.transcription.model
+                            model=config.transcription.model,
+                            retry_attempts=config.transcription.retry_attempts,
+                            retry_delay=config.transcription.retry_delay
                         )
                         transcript = transcriber.transcribe(audio_path)
                         progress.update(task2, completed=True)
@@ -492,7 +496,9 @@ def transcribe(cli_ctx: CLIContext, audio_path: Path, output_path: Optional[Path
             
             transcriber = Transcriber(
                 api_key=config.openai_api_key,
-                model=config.transcription.model
+                model=config.transcription.model,
+                retry_attempts=config.transcription.retry_attempts,
+                retry_delay=config.transcription.retry_delay
             )
             transcript = transcriber.transcribe(audio_path)
             
@@ -827,7 +833,9 @@ def download_and_process(cli_ctx: CLIContext, url: str, output_dir: Optional[Pat
             task2 = progress.add_task("Transcribing audio...", total=None)
             transcriber = Transcriber(
                 api_key=config.openai_api_key,
-                model=config.transcription.model
+                model=config.transcription.model,
+                retry_attempts=config.transcription.retry_attempts,
+                retry_delay=config.transcription.retry_delay
             )
             transcript = transcriber.transcribe(audio_path)
             progress.update(task2, completed=True)
