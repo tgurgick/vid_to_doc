@@ -781,11 +781,21 @@ def download_and_process(cli_ctx: CLIContext, url: str, output_dir: Optional[Pat
             TextColumn("[progress.description]{task.description}"),
             console=console
         ) as progress:
-            # Extract audio
-            task1 = progress.add_task("Extracting audio...", total=None)
-            extractor = AudioExtractor()
-            audio_path = extractor.extract_audio(downloaded_file)
-            progress.update(task1, completed=True)
+            # Check if downloaded file is already audio
+            audio_extensions = ['.wav', '.mp3', '.m4a', '.flac', '.ogg', '.mpga']
+            is_audio_file = downloaded_file.suffix.lower() in audio_extensions
+            
+            if is_audio_file:
+                # Skip audio extraction if file is already audio
+                console.print(f"[blue]File is already audio format: {downloaded_file.suffix}[/blue]")
+                audio_path = downloaded_file
+                progress.add_task("Skipping audio extraction (already audio file)...", total=None)
+            else:
+                # Extract audio from video
+                task1 = progress.add_task("Extracting audio...", total=None)
+                extractor = AudioExtractor()
+                audio_path = extractor.extract_audio(downloaded_file)
+                progress.update(task1, completed=True)
             
             # Transcribe audio
             task2 = progress.add_task("Transcribing audio...", total=None)
